@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boyfriend Verification System</title>
+  <meta name="description" content="Possible boyfriend detected. Identity verification required.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#071426">
+  <meta property="og:title" content="Boyfriend Verification System">
+  <meta property="og:description" content="⚠️ Possible boyfriend detected. Identity verification required.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23F4A6C1' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body data-screen="boot" data-mood="off">
+
+<!-- ============================================================
+     SVG ICON SPRITE (hearts, flowers, sparkles, music icons)
+     ============================================================ -->
+<svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  <defs>
+    <symbol id="i-heart" viewBox="0 0 24 24">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </symbol>
+    <symbol id="i-flower" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="6.3" rx="3.4" ry="4.5"/>
+      <ellipse cx="12" cy="6.3" rx="3.4" ry="4.5" transform="rotate(72 12 12)"/>
+      <ellipse cx="12" cy="6.3" rx="3.4" ry="4.5" transform="rotate(144 12 12)"/>
+      <ellipse cx="12" cy="6.3" rx="3.4" ry="4.5" transform="rotate(216 12 12)"/>
+      <ellipse cx="12" cy="6.3" rx="3.4" ry="4.5" transform="rotate(288 12 12)"/>
+      <circle cx="12" cy="12" r="2.7" style="fill: var(--flower-center, #FFF4D6)"/>
+    </symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24">
+      <path d="M12 1.5c.7 6.1 4.4 9.8 10.5 10.5-6.1.7-9.8 4.4-10.5 10.5C11.3 16.4 7.6 12.7 1.5 12 7.6 11.3 11.3 7.6 12 1.5z"/>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z"/></symbol>
+    <symbol id="i-vol" viewBox="0 0 24 24">
+      <path d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/>
+      <path d="M15.5 8.6a4.8 4.8 0 0 1 0 6.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M18.2 6a8.4 8.4 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24">
+      <path d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/>
+      <path d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============================================================
+     BACKGROUND: midnight sky, blue + pink glows, final-letter aurora
+     ============================================================ -->
+<div class="sky" aria-hidden="true">
+  <div class="sky__glow sky__glow--blue"></div>
+  <div class="sky__glow sky__glow--pink"></div>
+  <div class="sky__glow sky__glow--mix"></div>
+  <div class="aurora">
+    <span class="aurora__a"></span>
+    <span class="aurora__b"></span>
+    <span class="aurora__c"></span>
+  </div>
+</div>
+<div id="particles" class="particles" aria-hidden="true"></div>
+<div id="taps" class="taps" aria-hidden="true"></div>
+
+<main id="app">
+
+  <!-- ============================================================
+       SCREEN 0 — FAKE LOADING / SCANNER
+       ============================================================ -->
+  <section class="screen screen--scanner" id="scanner" aria-labelledby="scanner-h" hidden>
+    <div class="wrap wrap--narrow">
+      <h1 id="scanner-h" class="sr-only" tabindex="-1">Boyfriend verification system</h1>
+
+      <div class="terminal" id="terminal">
+        <p class="terminal__line" data-text="INITIALIZING BOYFRIEND VERIFICATION SYSTEM..."></p>
+        <p class="terminal__line" data-text="scanning..." data-extra="bar"></p>
+        <p class="terminal__line" data-text="checking girlfriend database..." data-extra="db"></p>
+        <div class="db-match" id="db-match" hidden>
+          <div class="db-match__photo img-wrap"><img data-role="databaseChen" alt="" decoding="async"></div>
+          <div class="db-match__text">
+            <span class="db-match__label">MATCH FOUND:</span>
+            <strong class="db-match__name">CHEN</strong>
+          </div>
+        </div>
+        <p class="terminal__line" data-text="civil engineering activity detected..."></p>
+        <p class="terminal__line" data-text="possible boyfriend located..."></p>
+        <span class="terminal__cursor" aria-hidden="true"></span>
+      </div>
+
+      <div class="detect" id="detect" hidden>
+        <p class="detect__alert" id="detect-alert"><span aria-hidden="true">⚠️</span> BOYFRIEND DETECTED <span aria-hidden="true">⚠️</span></p>
+
+        <div class="id-wrap">
+          <article class="id-card" aria-label="Scanned identity card">
+            <div class="id-card__photo scan-frame img-wrap">
+              <img data-role="scannerBradley" alt="" decoding="async">
+              <span class="scan-frame__line" aria-hidden="true"></span>
+              <span class="scan-frame__corners" aria-hidden="true"></span>
+              <span class="scan-frame__rec" aria-hidden="true">● SCANNING</span>
+              <span class="scan-frame__stamp" id="id-stamp" aria-hidden="true">IDENTITY CONFIRMED ✓</span>
+            </div>
+            <dl class="id-card__info">
+              <div class="id-row"><dt>NAME:</dt><dd>Bradley</dd></div>
+              <div class="id-row"><dt>SPECIES:</dt><dd>Civil Engineering student</dd></div>
+              <div class="id-row"><dt>STATUS:</dt><dd id="id-status">Chen’s bb (unverified)</dd></div>
+              <div class="id-row"><dt>THREAT LEVEL:</dt><dd class="id-threat">Handsome unfortunately <span class="threat-bar" aria-hidden="true"><span></span></span></dd></div>
+            </dl>
+          </article>
+          <!-- HIDDEN BRADLEY #1 — peeking from behind the ID card -->
+          <button class="egg-head egg-head--1" type="button" data-head="1" aria-label="Something is peeking behind the ID card">
+            <img data-role="eggHead" alt="" decoding="async" draggable="false">
+          </button>
+        </div>
+
+        <p class="detect__text">Possible Bradley detected.<br>Identity verification required.</p>
+        <h2 class="question question--scanner">Are you Chen’s boyfriend?</h2>
+        <div class="choice-row">
+          <button class="btn btn--blue btn--lg" type="button" id="scanner-yes">YES, THAT’S ME</button>
+          <button class="btn btn--no" type="button" id="scanner-no">NO</button>
+        </div>
+        <div class="reaction" id="scanner-reaction" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 1 — LOVE VERIFICATION
+       ============================================================ -->
+  <section class="screen" id="love" aria-labelledby="love-h" hidden>
+    <div class="wrap wrap--narrow">
+      <div class="panel panel--center" id="love-ask">
+        <p class="eyebrow">verification · step 2</p>
+        <h2 class="title" id="love-h" tabindex="-1">One more thing...</h2>
+        <p class="question">Do you love Chen?</p>
+        <div class="choice-row choice-row--love">
+          <button class="btn btn--pink btn--xl" type="button" id="love-yes">YES, VERY MUCH ♡</button>
+          <button class="btn btn--no btn--tiny" type="button" id="love-no">no</button>
+        </div>
+        <div class="reaction" id="love-reaction" aria-live="polite"></div>
+      </div>
+
+      <div class="panel panel--center love-success" id="love-success" hidden>
+        <div class="cat-hearts">
+          <figure class="sticker sticker--hero" style="--rot:-4deg">
+            <img data-role="blushCat" alt="" decoding="async">
+          </figure>
+          <span class="cat-hearts__h" aria-hidden="true"></span>
+          <span class="cat-hearts__h" aria-hidden="true"></span>
+          <span class="cat-hearts__h" aria-hidden="true"></span>
+          <span class="cat-hearts__h" aria-hidden="true"></span>
+          <span class="cat-hearts__h" aria-hidden="true"></span>
+          <span class="cat-hearts__h" aria-hidden="true"></span>
+        </div>
+        <h2 class="title title--big" id="love-success-h" tabindex="-1">Correct.</h2>
+        <p class="lead">I knew you were smart.</p>
+        <figure class="photo photo--tiny love-success__kiss">
+          <div class="img-wrap img-wrap--portrait"><img data-role="kissSmall" alt="" decoding="async"></div>
+          <figcaption>acceptable answer ♡</figcaption>
+        </figure>
+        <button class="btn btn--grad btn--lg" type="button" data-next="commit">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 2 — BOYFRIEND COMMITMENT TEST
+       ============================================================ -->
+  <section class="screen" id="commit" aria-labelledby="commit-h" hidden>
+    <div class="wrap wrap--narrow">
+      <header class="section-head">
+        <h2 class="title" id="commit-h" tabindex="-1">Boyfriend Commitment Test</h2>
+        <div class="steps" id="commit-steps" aria-hidden="true">
+          <span class="steps__dot"></span><span class="steps__dot"></span><span class="steps__dot"></span><span class="steps__dot"></span><span class="steps__dot"></span>
+          <span class="steps__lock">🔒</span>
+        </div>
+        <p class="steps__label" id="commit-label">question 1 of 5</p>
+      </header>
+      <div class="panel panel--center commit-card" id="commit-card"></div>
+      <div class="reaction" id="commit-reaction" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 3 — BRADLEY BEHAVIORAL RESEARCH INSTITUTE
+       ============================================================ -->
+  <section class="screen" id="research" aria-labelledby="research-h" hidden>
+    <div class="wrap">
+      <div class="lab-head-wrap">
+        <header class="lab-head">
+          <p class="eyebrow">department of boyfriend studies</p>
+          <h2 class="title" id="research-h" tabindex="-1"><span aria-hidden="true">🔬</span> Bradley Behavioral Research Institute</h2>
+          <p class="subtitle">Findings peer-reviewed by Chen and nobody else.</p>
+        </header>
+        <!-- HIDDEN BRADLEY #2 — peeking from behind the heading card -->
+        <button class="egg-head egg-head--2" type="button" data-head="2" aria-label="Something is peeking behind the research heading">
+          <img data-role="eggHead" alt="" decoding="async" draggable="false">
+        </button>
+      </div>
+
+      <div class="lab-grid">
+        <!-- CARD 1 — MARCHENDISE -->
+        <article class="lab-card" data-lab="1">
+          <p class="lab-card__tag">FILE #001</p>
+          <h3 class="lab-card__title">SUBJECT OBSERVATION #001</h3>
+          <dl class="lab-rows">
+            <div><dt>Stimulus:</dt><dd>sees the word “merchandise”</dd></div>
+            <div><dt>Normal brain:</dt><dd class="mono">merchandise</dd></div>
+            <div><dt>Bradley brain:</dt><dd class="lab-morph" id="lab-morph"><span class="mono lab-morph__word">??????????</span></dd></div>
+          </dl>
+          <button class="btn btn--chip" type="button" data-lab-run="1">▶ run scan</button>
+          <div class="lab-card__result" hidden>
+            <p class="lab-result"><span class="lab-result__k">Result:</span> Diagnosis: girlfriend infestation.</p>
+            <figure class="snap" style="--rot:-4deg">
+              <div class="img-wrap img-wrap--wide"><img data-role="infestation" alt="" decoding="async"></div>
+            </figure>
+          </div>
+        </article>
+
+        <!-- CARD 2 — CHICKENAE -->
+        <article class="lab-card" data-lab="2">
+          <p class="lab-card__tag">FILE #002</p>
+          <h3 class="lab-card__title">Random neurological event</h3>
+          <p class="lab-line">Silence exists for 4.2 seconds.</p>
+          <div class="silence" aria-hidden="true">
+            <div class="silence__bar"><span></span></div>
+            <span class="silence__time mono">0.0s</span>
+          </div>
+          <button class="btn btn--chip" type="button" data-lab-run="2">▶ observe</button>
+          <div class="lab-card__result" hidden>
+            <p class="lab-line"><span class="lab-result__k">Bradley:</span></p>
+            <p class="shout shout--chickenae">CHICKENAE</p>
+            <p class="lab-result"><span class="lab-result__k">Result:</span> No known cure.</p>
+          </div>
+        </article>
+
+        <!-- CARD 3 — THE TIGREAL INCIDENT -->
+        <article class="lab-card lab-card--tigreal" data-lab="3">
+          <p class="lab-card__tag">FILE #003 · CLASSIFIED</p>
+          <h3 class="lab-card__title">THE TIGREAL INCIDENT</h3>
+          <dl class="lab-rows">
+            <div><dt>Chen’s middle name:</dt><dd class="lab-big">Tigol</dd></div>
+            <div><dt>Bradley’s remaining brain cell:</dt><dd><span class="brain-cell" id="brain-cell" aria-hidden="true"><span class="brain-cell__dot"></span><span class="brain-cell__load"><span></span></span><span class="brain-cell__txt mono">brain cell (1 of 1)</span></span></dd></div>
+          </dl>
+          <button class="btn btn--chip" type="button" data-lab-run="3">▶ process name</button>
+          <div class="lab-card__result" hidden>
+            <p class="shout shout--tigreal">TIGREAL</p>
+            <figure class="sticker sticker--md lab-card__sticker" style="--rot:5deg">
+              <img data-role="tigrealLaugh" alt="" decoding="async">
+            </figure>
+          </div>
+        </article>
+
+        <!-- CARD 4 — PIKON METER -->
+        <article class="lab-card" data-lab="4">
+          <p class="lab-card__tag">FILE #004</p>
+          <h3 class="lab-card__title">PIKON METER</h3>
+          <div class="pikon" aria-hidden="true">
+            <span class="pikon__end">CALM</span>
+            <div class="pikon__track"><span class="pikon__fill"></span><span class="pikon__knob"></span></div>
+            <span class="pikon__end pikon__end--hot">PIKON</span>
+          </div>
+          <p class="sr-only">Meter reading: all the way to PIKON.</p>
+          <button class="btn btn--chip" type="button" data-lab-run="4">▶ measure</button>
+          <div class="lab-card__result" hidden>
+            <div class="pikon-split">
+              <div class="pikon-split__col">
+                <p class="lab-result__k">Outside:</p>
+                <p class="pikon-outside"><span aria-hidden="true">🙂</span> “okay bb”</p>
+              </div>
+              <div class="pikon-split__col">
+                <p class="lab-result__k">Inside:</p>
+                <figure class="sticker sticker--sm" style="--rot:-6deg"><img data-role="grumpyCat" alt="" decoding="async"></figure>
+              </div>
+            </div>
+            <p class="shout shout--aaa">AAAAAAAAAAAAAAAA</p>
+            <figure class="snap snap--small lab-card__aftermath" style="--rot:4deg">
+              <div class="img-wrap img-wrap--portrait"><img data-role="aftermath" alt="" decoding="async"></div>
+              <figcaption>fig. 4b: aftermath</figcaption>
+            </figure>
+          </div>
+        </article>
+
+        <!-- CARD 5 — THE COMPLIMENT DEPARTMENT -->
+        <article class="lab-card lab-card--soft" data-lab="5">
+          <p class="lab-card__tag">FILE #005</p>
+          <h3 class="lab-card__title">THE COMPLIMENT DEPARTMENT</h3>
+          <p class="lab-line"><span class="lab-result__k">System notification:</span></p>
+          <div class="notif-stack">
+            <div class="notif" id="notif">
+              <span class="notif__app">bb <span aria-hidden="true">·</span> now</span>
+              <span class="notif__msg" id="notif-msg" data-msg="“Lami kayka.”">2 new notifications</span>
+            </div>
+            <div class="notif notif--second" id="notif-2" hidden>
+              <span class="notif__app">bb <span aria-hidden="true">·</span> also now</span>
+              <span class="notif__msg">“Gwapa kayka.”</span>
+            </div>
+          </div>
+          <button class="btn btn--chip" type="button" data-lab-run="5">▶ check notifications</button>
+          <div class="lab-card__result" hidden>
+            <p class="lab-line"><span class="lab-result__k">Delivery frequency:</span> approximately <span class="mono counter" id="compliment-count">728283</span> times per day.</p>
+            <div class="soften">
+              <p class="soften__line">I still like hearing it every single time. ♡</p>
+              <figure class="sticker sticker--sm sticker--soft" style="--rot:3deg"><img data-role="softCat" alt="" decoding="async"></figure>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="after" id="research-after" hidden>
+        <button class="btn btn--grad btn--lg" type="button" data-next="exam">Continue to the exam</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 4 — BOYFRIEND EXAM
+       ============================================================ -->
+  <section class="screen" id="exam" aria-labelledby="exam-h" hidden>
+    <div class="wrap wrap--narrow">
+      <header class="section-head">
+        <h2 class="title title--caps" id="exam-h" tabindex="-1">HOW WELL DO YOU KNOW YOUR GIRLFRIEND?</h2>
+        <p class="subtitle">A completely fair and unbiased examination.</p>
+      </header>
+
+      <div class="exam-progress-wrap">
+        <!-- HIDDEN BRADLEY #3 — peeking from behind the progress indicator -->
+        <button class="egg-head egg-head--3" type="button" data-head="3" aria-label="Something is peeking behind the progress bar">
+          <img data-role="eggHead" alt="" decoding="async" draggable="false">
+        </button>
+        <div class="exam-progress" id="exam-progress">
+          <div class="exam-progress__top">
+            <span class="mono" id="exam-count">QUESTION 1/5</span>
+            <span class="mono exam-progress__pct" id="exam-pct">0%</span>
+          </div>
+          <div class="exam-progress__bar" role="progressbar" aria-label="Exam progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" id="exam-bar"><span></span></div>
+        </div>
+      </div>
+
+      <div class="panel exam-card" id="exam-card"></div>
+
+      <div class="panel panel--center exam-result" id="exam-result" hidden>
+        <p class="exam-result__raw mono">raw score: <s id="exam-raw">0/5</s></p>
+        <p class="exam-result__score" id="exam-score">100%</p>
+        <p class="exam-result__cert">CERTIFIED BOYFRIEND <span class="check">✓</span></p>
+        <p class="fine">Results may have been manipulated by girlfriend.</p>
+        <p class="lead">After careful evaluation, you remain qualified to be Chen’s boyfriend.</p>
+        <figure class="photo photo--small exam-result__photo">
+          <div class="img-wrap img-wrap--portrait"><img data-role="quizPassed" alt="" decoding="async"></div>
+          <figcaption>somehow he passed.</figcaption>
+        </figure>
+        <button class="btn btn--grad btn--lg" type="button" data-next="rewards">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 5 — MYSTERY REWARDS
+       ============================================================ -->
+  <section class="screen" id="rewards" aria-labelledby="rewards-h" hidden>
+    <div class="wrap wrap--narrow">
+      <header class="section-head rewards-head">
+        <p class="eyebrow">mystery rewards</p>
+        <h2 class="title" id="rewards-h" tabindex="-1">Choose one reward.</h2>
+        <div class="rewards-spoiled" id="rewards-spoiled" hidden>
+          <p class="rewards-spoiled__text">Actually whatever.<br>You’re spoiled.<br>Open them all.</p>
+          <figure class="sticker sticker--sm" style="--rot:6deg">
+            <img data-role="approvedCat" alt="" decoding="async">
+            <figcaption class="sticker__cap">approved ♡</figcaption>
+          </figure>
+        </div>
+      </header>
+
+      <div class="gifts">
+        <div class="gift-slot">
+          <button class="gift gift--blue" type="button" data-gift="blue" aria-label="Open the blue gift box">
+            <span class="gift__glow" aria-hidden="true"></span>
+            <span class="gift__box" aria-hidden="true"></span>
+            <span class="gift__lid" aria-hidden="true"><span class="gift__bow"></span></span>
+          </button>
+          <p class="gift__label" aria-live="polite"></p>
+        </div>
+        <div class="gift-slot">
+          <button class="gift gift--pink" type="button" data-gift="pink" aria-label="Open the pink gift box">
+            <span class="gift__glow" aria-hidden="true"></span>
+            <span class="gift__box" aria-hidden="true"></span>
+            <span class="gift__lid" aria-hidden="true"><span class="gift__bow"></span></span>
+          </button>
+          <p class="gift__label" aria-live="polite"></p>
+        </div>
+        <div class="gift-slot gift-slot--purple">
+          <!-- HIDDEN BRADLEY #4 — peeking from behind the purple box -->
+          <button class="egg-head egg-head--4" type="button" data-head="4" aria-label="Something is peeking behind the purple box">
+            <img data-role="eggHead" alt="" decoding="async" draggable="false">
+          </button>
+          <button class="gift gift--purple" type="button" data-gift="purple" aria-label="Open the purple gift box">
+            <span class="gift__glow" aria-hidden="true"></span>
+            <span class="gift__box" aria-hidden="true"></span>
+            <span class="gift__lid" aria-hidden="true"><span class="gift__bow"></span></span>
+          </button>
+          <p class="gift__label" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="after" id="rewards-after" hidden>
+        <button class="btn btn--grad btn--lg" type="button" data-next="breather">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TRANSITION — "okay, enough bullying you..."
+       ============================================================ -->
+  <section class="screen screen--breather" id="breather" aria-labelledby="breather-h" hidden>
+    <div class="wrap wrap--narrow breather">
+      <figure class="sticker sticker--md breather__sticker" style="--rot:-3deg">
+        <img data-role="heartPose" alt="" decoding="async">
+      </figure>
+      <h2 class="breather__text" id="breather-h" tabindex="-1">okay, enough bullying you...</h2>
+      <button class="btn btn--soft btn--lg breather__btn" type="button" data-next="things">continue ♡</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 6 — THINGS I UNFORTUNATELY LOVE ABOUT YOU
+       ============================================================ -->
+  <section class="screen screen--things" id="things" aria-labelledby="things-h" hidden>
+    <div class="wrap">
+      <header class="things-head">
+        <span class="deco-fl deco-fl--a" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="deco-fl deco-fl--b" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <figure class="snap snap--taped things-head__photo" style="--rot:-5deg">
+          <div class="img-wrap img-wrap--portrait"><img data-role="thingsTaped" alt="" decoding="async"></div>
+        </figure>
+        <h2 class="title title--soft" id="things-h" tabindex="-1">Things I Unfortunately Love About You</h2>
+        <p class="hint">tap each one ♡</p>
+      </header>
+
+      <div class="love-grid love-grid--three">
+        <div class="love-card" data-card="eyes">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-eyes">
+            <span class="love-card__label">your eyes</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-eyes" hidden>
+            <p class="love-card__text">criminally pretty.</p>
+            <figure class="photo photo--mini"><div class="img-wrap img-wrap--portrait"><img data-role="thingsEyes" alt="" decoding="async"></div></figure>
+          </div>
+        </div>
+        <div class="love-card" data-card="face">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-face">
+            <span class="love-card__label">your face</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-face" hidden>
+            <p class="love-card__text">unfortunately handsome.</p>
+            <figure class="photo photo--mini"><div class="img-wrap img-wrap--portrait"><img data-role="thingsFace" alt="" decoding="async"></div></figure>
+          </div>
+        </div>
+        <div class="love-card" data-card="egg">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-egg">
+            <span class="love-card__label">your egg-looking face</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-egg" hidden>
+            <p class="love-card__text">still handsome somehow. unfair.</p>
+            <p class="love-card__sub"><span role="img" aria-label="egg and heart">🥚♡</span></p>
+            <figure class="photo photo--mini photo--egg"><div class="img-wrap img-wrap--portrait"><img data-role="thingsEgg" alt="" decoding="async"></div></figure>
+          </div>
+        </div>
+        <div class="love-card" data-card="body">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-body">
+            <span class="love-card__label">your body</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-body" hidden>
+            <p class="love-card__text"><span class="redacted">[REDACTED BY HR]</span></p>
+          </div>
+        </div>
+        <div class="love-card love-card--wide" data-card="moments">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-moments">
+            <span class="love-card__label">your random little moments</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal love-card__reveal--split" id="lc-moments" hidden>
+            <p class="love-card__text">even when you’re literally just being weird, I like watching you be you.</p>
+            <figure class="photo photo--mini photo--moments"><div class="img-wrap img-wrap--square"><img data-role="thingsMoments" alt="" decoding="async"></div></figure>
+          </div>
+        </div>
+      </div>
+
+      <div class="love-grid love-grid--two">
+        <div class="love-card love-card--sincere" data-card="compliment">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-compliment">
+            <span class="love-card__label">the way you compliment me</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-compliment" hidden>
+            <p class="love-card__text">You tell me I’m beautiful so often, and somehow you still say it like you genuinely mean it.</p>
+          </div>
+        </div>
+        <div class="love-card love-card--sincere" data-card="care">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-care">
+            <span class="love-card__label">the way you care</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-care" hidden>
+            <p class="love-card__text">I notice the little ways you care about me, even when you probably don’t realize I’m noticing.</p>
+          </div>
+        </div>
+        <div class="love-card love-card--sincere" data-card="trying">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-trying">
+            <span class="love-card__label">the way you’re trying</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-trying" hidden>
+            <p class="love-card__text">We’re both still learning how to love another person. I notice when you try.</p>
+          </div>
+        </div>
+        <div class="love-card love-card--sincere" data-card="kindness">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-kindness">
+            <span class="love-card__label">your kindness</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-kindness" hidden>
+            <p class="love-card__text">One of the things that made me comfortable with you in the first place.</p>
+            <figure class="photo photo--mini photo--wide-ok"><div class="img-wrap img-wrap--portrait"><img data-role="thingsKindness" alt="" decoding="async"></div></figure>
+          </div>
+        </div>
+        <div class="love-card love-card--sincere" data-card="faith">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-faith">
+            <span class="love-card__label">your faith in God</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-faith" hidden>
+            <p class="love-card__text">I love seeing how much your faith means to you and how you keep God close to your heart.</p>
+          </div>
+        </div>
+        <div class="love-card love-card--sincere" data-card="beautiful">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-beautiful">
+            <span class="love-card__label">the way you make me feel beautiful</span><span class="love-card__icon" aria-hidden="true">♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-beautiful" hidden>
+            <p class="love-card__text">You’ve told me I’m beautiful so many times, and somehow I still want to hear it from you.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="love-final-wrap">
+        <div class="love-card love-card--final is-locked" data-card="everything">
+          <button class="love-card__toggle" type="button" aria-expanded="false" aria-controls="lc-everything" aria-disabled="true" aria-describedby="lc-lock">
+            <span class="love-card__label">everything.</span>
+            <span class="love-card__lock" id="lc-lock">open the others first ♡</span>
+          </button>
+          <div class="love-card__reveal" id="lc-everything" hidden>
+            <p class="love-card__text love-card__text--final">I think I just love you.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- little flower bed: the SECRET FLOWER and HIDDEN BRADLEY #5 live here -->
+      <div class="flower-bed">
+        <span class="fl fl--blue" style="--s:20px;--r:-12deg" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="fl fl--pink" style="--s:14px;--r:10deg;--y:-10px" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="fl fl--pink" style="--s:24px;--r:4deg" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="fl fl--blue" style="--s:15px;--r:-20deg;--y:-14px" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="fl fl--pink" style="--s:18px;--r:16deg;--y:-4px" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <button class="fl fl--pink secret-flower" type="button" style="--s:17px;--r:-6deg;--y:-12px" aria-label="A tiny pink flower">
+          <svg class="ico" aria-hidden="true"><use href="#i-flower"/></svg>
+        </button>
+        <span class="fl fl--blue" style="--s:22px;--r:8deg" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="fl fl--pink" style="--s:13px;--r:-14deg;--y:-16px" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="fl fl--pink" style="--s:21px;--r:12deg;--y:-3px" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        <span class="fl-cover">
+          <!-- HIDDEN BRADLEY #5 — partially hidden behind the big blue flower -->
+          <button class="egg-head egg-head--5" type="button" data-head="5" aria-label="Something is hiding behind the flowers">
+            <img data-role="eggHead" alt="" decoding="async" draggable="false">
+          </button>
+          <span class="fl fl--blue fl--big" style="--s:40px;--r:-8deg" aria-hidden="true"><svg class="ico"><use href="#i-flower"/></svg></span>
+        </span>
+      </div>
+
+      <div class="after after--quiet" id="things-after" hidden>
+        <button class="btn btn--soft btn--lg" type="button" data-next="fake-end">continue ♡</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 7 — FAKE ENDING
+       ============================================================ -->
+  <section class="screen screen--fake-end" id="fake-end" aria-labelledby="fake-h" hidden>
+    <div class="wrap wrap--narrow fake-end">
+      <h2 class="fake-end__title" id="fake-h" tabindex="-1">
+        HAPPY FIRST MONTHSARY!
+        <span class="hearts-duo" role="img" aria-label="blue heart and pink heart">
+          <svg class="ico ico--blue" aria-hidden="true"><use href="#i-heart"/></svg><svg class="ico ico--pink" aria-hidden="true"><use href="#i-heart"/></svg>
+        </span>
+      </h2>
+      <p class="fake-end__sub">That’s everything :)</p>
+      <button class="btn btn--exit" type="button" id="exit-btn">EXIT WEBSITE</button>
+      <figure class="sticker sticker--md exit-cry" id="exit-cry" style="--rot:-4deg" hidden>
+        <img data-role="exitCry" alt="" decoding="async">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 8 — FINAL LETTER (+ final question)
+       ============================================================ -->
+  <section class="screen screen--letter" id="letter" aria-labelledby="letter-h" hidden>
+    <div class="letter-wrap">
+      <article class="letter" id="letter-body">
+        <div class="letter__ornament" aria-hidden="true">
+          <svg class="ico ico--blue"><use href="#i-heart"/></svg><svg class="ico ico--pink"><use href="#i-heart"/></svg>
+        </div>
+        <h2 class="letter__to" id="letter-h" tabindex="-1">To my bb,</h2>
+
+        <p>It’s funny thinking about how all of this started because I genuinely wasn’t looking for a relationship when you came into my life.</p>
+        <p>The first time I really noticed you wasn’t even romantic. You kept appearing in my TikTok profile visits and I was like, “kinsa man ni siya?” 😭 I also had this feeling that I’d seen you somewhere before. Maybe because I’d seen your posts about ECHO, maybe around school — I just knew your face looked weirdly familiar.</p>
+        <p>Then around July, you finally had the guts to message me on TikTok.</p>
+        <p>The funny part is I wasn’t interested in relationships at all. I didn’t know you, my mind wasn’t revolving around love, and entering a relationship was genuinely nowhere in my plans.</p>
+        <p>Then when I reactivated my Facebook after I was doing okay again, you messaged me almost immediately.</p>
+        <p class="l-aside">Fast hands yarn? 😭</p>
+
+        <div class="letter__break" aria-hidden="true"><span></span><span></span></div>
+
+        <p>And then we actually met.</p>
+        <p>You were trying to hold my hand while I was internally PALPITATING. I literally went and ranted to Dianne about it afterward HAHAHA.</p>
+        <p>Then one meeting became another, and somehow you slowly became part of my days.</p>
+        <p>When you went home to your hometown, you kept updating me about random things happening there. They probably felt like ordinary little updates to you, but I loved receiving them. I loved hearing about the little things happening in your day.</p>
+        <p>Then you came back to Cebu and we met again.</p>
+        <p>I wasn’t okay that day, and I remember needing that hug.</p>
+        <p class="l-short">Especially that back hug.</p>
+        <p class="l-short">Of course I was acting normal.</p>
+        <p class="l-aside">Deep inside: PALPITATIONS PART 2. 😭</p>
+
+        <div class="letter__break" aria-hidden="true"><span></span><span></span></div>
+
+        <p>I still don’t know exactly how you did it.</p>
+        <p>Somewhere between your random updates, our meetings, the conversations, the walks, the hugs, and simply being around you, I became comfortable with you.</p>
+        <p>Maybe because even before I completely understood what I felt, something in me already knew you were a good person.</p>
+        <p>And I’m really glad I trusted that feeling.</p>
+        <p class="l-emph">I wasn’t wrong for choosing you.</p>
+
+        <div class="letter__break" aria-hidden="true"><span></span><span></span></div>
+
+        <p>This first month hasn’t only taught me things about you. It has taught me a lot about myself too.</p>
+        <p>There is one thing I’m still learning how to explain to you.</p>
+        <p>Sometimes when I say I want your attention, I don’t mean that I need every hour of your day or that you always have to be beside me.</p>
+        <p class="l-emph l-emph--soft">I think what I really want is to feel noticed by you.</p>
+        <p>I hope that as we spend more time together, you’ll keep learning the small things about me — the things I like, the things that make me quiet, the things that make me happy, the little changes in my mood, the random stories I tell you, and even the things I don’t always know how to explain properly.</p>
+        <p>Because being known by someone means so much to me.</p>
+        <p>Knowing me means so much to me.</p>
+        <p>And I want to know you that way too.</p>
+        <p class="l-short">Not just the big things.</p>
+        <p>I want to keep discovering the random, stupid, ordinary little details that make you you.</p>
+
+        <div class="letter__break" aria-hidden="true"><span></span><span></span></div>
+
+        <p>Sometimes I crave your attention more than I know how to admit.</p>
+        <p>Sometimes I want you to look for me, ask about me, or want to see me even if it’s only for a few minutes, because your presence means more to me than I expected it would.</p>
+        <p>And sometimes instead of simply telling you that, I get scared that I’m asking for too much.</p>
+        <p class="l-short">I’m still learning.</p>
+        <div class="l-group">
+          <p>I’m learning to tell you what I need instead of expecting you to somehow read my mind.</p>
+          <p>I’m learning how to communicate instead of shutting down when I’m hurt.</p>
+          <p>I’m learning how to ask for affection instead of hoping you’ll magically know.</p>
+          <p>And I’m learning how to love someone without losing myself in them.</p>
+        </div>
+        <p>I know there are parts of me that aren’t always easy to understand.</p>
+        <p>I’m still learning and unlearning things, and I hope you’ll keep being patient with me while I do the same for you.</p>
+        <p>Thank you for trying to understand me while I’m learning all of that.</p>
+
+        <div class="letter__break" aria-hidden="true"><span></span><span></span></div>
+
+        <div class="l-group">
+          <p>I notice your effort, bb.</p>
+          <p>I notice how you care.</p>
+          <p>I notice how often you make me feel beautiful.</p>
+          <p>I notice your eyes, your kindness, your faith, your ridiculous randomness, and all those tiny things about you that probably don’t even seem important to you.</p>
+        </div>
+
+        <div class="l-group l-group--love">
+          <p>I love hearing you talk about the Gospel.</p>
+          <p>I love your eyes.</p>
+          <p>I love your face.</p>
+          <p>I love your hugs.</p>
+          <p>I love your kindness.</p>
+          <p>I love listening to your random updates.</p>
+          <p>I love the way you’re trying.</p>
+          <p>I love when you somehow turn completely unrelated words into my name.</p>
+          <p>I even love how you call me Tigreal because of my middle name, even though I WILL NEVER FORGIVE YOU FOR THAT.</p>
+          <p>I love when you randomly say Chickenae.</p>
+          <p>I love your weirdness.</p>
+          <p>I love your body.</p>
+          <p>I love your attitude.</p>
+          <p>I love the way you make me feel beautiful.</p>
+        </div>
+
+        <div class="letter__break" aria-hidden="true"><span></span><span></span></div>
+
+        <p>And somehow, after everything, I still can’t give you one perfect explanation for how you got me.</p>
+        <p class="l-short">You just did.</p>
+        <p>Out of all the things I was expecting from my life when you first messaged me, you weren’t one of them.</p>
+        <p>But I’m happy you’re here.</p>
+        <p>We’re only one month in, so maybe it’s ridiculously early to say this.</p>
+        <p class="l-short">But if I’m allowed to hope —</p>
+        <p class="l-emph">I hope you’re my last.</p>
+        <p>Not because I expect us to know everything about our future after only one month, and not because either of us will always be perfect.</p>
+        <p>I hope you’re my last because right now, knowing you as I do and loving you as I do, you’re the person I hope I get to keep choosing.</p>
+
+        <div class="letter__break" aria-hidden="true"><span></span><span></span></div>
+
+        <p>I don’t know everything that comes after our first month.</p>
+        <p>I just hope that while we’re here, we keep learning each other, noticing each other, choosing each other, talking even when it’s difficult, growing individually, and letting our relationship grow with us.</p>
+        <p>Thank you for making me feel cared for.</p>
+        <p>Thank you for trying.</p>
+        <p>Thank you for all the stupid little moments, the random updates, the hugs, the laughs, the names you somehow invent for me, and all the ordinary moments that somehow became us.</p>
+        <p class="l-short">For what it’s worth —</p>
+        <p class="l-emph l-emph--big">I’d choose you again.</p>
+
+        <!-- P7: the saved photo -->
+        <figure class="p7 p7--letter" id="p7-letter">
+          <div class="p7__frame img-wrap img-wrap--p7"><img data-role="favorite" alt="" decoding="async"></div>
+        </figure>
+
+        <p class="l-close">Happy first monthsary, bb.</p>
+        <p class="l-close l-close--love">I love you. ♡</p>
+      </article>
+
+      <!-- FINAL QUESTION -->
+      <div class="final-q" id="final-q">
+        <p class="final-q__so">So, bb...</p>
+        <p class="final-q__one">one last question.</p>
+        <p class="final-q__if">If you could go back to the beginning knowing everything you know about me now...</p>
+        <h3 class="final-q__ask">WOULD YOU CHOOSE ME AGAIN?</h3>
+        <div class="choice-row choice-row--final">
+          <button class="btn btn--pink btn--xl" type="button" id="final-yes">YES, I WOULD ♡</button>
+          <button class="btn btn--no btn--quiet" type="button" id="final-no">no</button>
+        </div>
+        <p class="final-q__msg" id="final-msg" aria-live="polite"></p>
+      </div>
+
+      <div class="reread-back" id="reread-back" hidden>
+        <button class="btn btn--soft btn--lg" type="button" id="reread-done">back to the end ♡</button>
+      </div>
+    </div>
+    <div class="scroll-hint" id="scroll-hint" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- ============================================================
+       ENDING — "Good." + P7 + fireworks
+       ============================================================ -->
+  <section class="screen screen--ending" id="ending" aria-labelledby="ending-h" hidden>
+    <div class="wrap wrap--narrow ending">
+      <h2 class="ending__good seq" id="ending-h" tabindex="-1">Good.</h2>
+      <p class="ending__too seq">I’d choose you again too.</p>
+      <figure class="p7 p7--ending seq ending__later" id="p7-ending">
+        <div class="p7__frame img-wrap img-wrap--p7"><img data-role="favorite" alt="" decoding="async"></div>
+      </figure>
+      <p class="ending__happy seq ending__later">happy first monthsary, bb. ♡</p>
+      <p class="ending__date seq ending__later">09.23.26</p>
+
+      <div class="requirement seq ending__later" id="requirement">
+        <p class="requirement__k">Final requirement to complete boyfriend verification:</p>
+        <p class="requirement__v">KISS YOUR GIRLFRIEND.<br><span>A LOT.</span></p>
+        <button class="btn btn--grad btn--lg" type="button" id="mission-btn">MISSION ACCEPTED 😌</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FINAL CERTIFICATION
+       ============================================================ -->
+  <section class="screen screen--certified" id="certified" aria-labelledby="cert-h" hidden>
+    <div class="wrap wrap--narrow">
+      <div class="cert">
+        <div class="cert__seal" aria-hidden="true"><span>✓</span></div>
+        <h2 class="cert__title" id="cert-h" tabindex="-1">✓ BOYFRIEND VERIFICATION COMPLETE</h2>
+        <p class="cert__line">Bradley has successfully completed all requirements.</p>
+        <div class="cert__reward">
+          <p class="cert__k">Reward:</p>
+          <p class="cert__v">CHEN ♡</p>
+        </div>
+        <div class="cert__terms">
+          <p class="cert__k">Terms may include:</p>
+          <p class="cert__list">random tampo,<br>lambing requests,<br>Milo consumption,<br>nagagalt sa Tigreal nickname mo,<br>very talkative GF,<br>mahilig mang-pikon GF,<br>and excessive love.</p>
+        </div>
+        <p class="cert__built">built with ♡ by your favorite computer engineer</p>
+      </div>
+      <p class="cert__again"><button class="link-btn" type="button" id="reread-btn">read the letter again ♡</button></p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================================================
+     GLOBAL LAYERS: fireworks canvas, toast, peek, modal, void, music
+     ============================================================ -->
+<canvas id="fx" class="fx" aria-hidden="true"></canvas>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="peek" id="peek" aria-hidden="true">
+  <figure class="peek__sticker">
+    <img id="peek-img" alt="" decoding="async">
+    <figcaption class="peek__cap" id="peek-cap"></figcaption>
+  </figure>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal__backdrop" data-modal-close></div>
+  <div class="modal__card" id="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"></div>
+</div>
+
+<div class="void" id="void" hidden>
+  <div class="void__inner">
+    <p class="void__line" id="void-1">...</p>
+    <p class="void__line" id="void-2">wait.</p>
+    <p class="void__line void__line--long" id="void-3">you didn’t seriously think I’d stop talking that easily, right?</p>
+    <button class="btn btn--lastthing" type="button" id="last-thing">one last thing ♡</button>
+  </div>
+  <figure class="void__peek" id="void-peek" aria-hidden="true">
+    <img data-role="nervousPeek" alt="" decoding="async">
+  </figure>
+</div>
+
+<div class="music" id="music" hidden>
+  <span class="music__label" id="music-label" aria-live="polite"></span>
+  <div class="music__tray" id="music-tray" hidden>
+    <button class="music__btn" type="button" id="music-toggle" aria-label="Pause music">
+      <svg class="ico" aria-hidden="true"><use href="#i-pause"/></svg>
+    </button>
+    <button class="music__btn" type="button" id="music-mute" aria-label="Mute music">
+      <svg class="ico" aria-hidden="true"><use href="#i-vol"/></svg>
+    </button>
+    <input class="music__vol" type="range" id="music-vol" min="0" max="1" step="0.05" value="0.35" aria-label="Music volume">
+  </div>
+  <button class="music__fab" type="button" id="music-fab" aria-label="Music controls" aria-expanded="false" aria-controls="music-tray">
+    <span class="music__eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="music__note" aria-hidden="true">♫</span>
+  </button>
+</div>
+
+<audio id="song" preload="none" loop></audio>
+
+<noscript>
+  <div class="noscript">This little website needs JavaScript turned on ♡</div>
+</noscript>
+
+</body>
+</html>
